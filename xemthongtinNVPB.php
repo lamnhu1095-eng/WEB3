@@ -1,29 +1,42 @@
 <?php
-// Lay ma phong ban IDPB tu trang xemthongtinpb.php
-$mapb = $_REQUEST['IDPB'];
-
+// xemthongtinNVPB.php
+$mapb = isset($_REQUEST['IDPB']) ? $_REQUEST['IDPB'] : '';
 $bienketnoi = mysqli_connect('localhost', 'root', '') or die('Could not connect: ' . mysqli_connect_error());
-
-// Chon CSDL de lam viec
 mysqli_select_db($bienketnoi, 'DULIEU');
 
-if ($mapb == "") {
+if ($mapb == '') {
     $rs = mysqli_query($bienketnoi, "SELECT * FROM NHANVIEN");
+    $subtitle = 'Tất Cả Nhân Viên';
 } else {
-    $rs = mysqli_query($bienketnoi, "SELECT * FROM NHANVIEN WHERE IDPB='$mapb'");
+    $rs = mysqli_query($bienketnoi, "SELECT * FROM NHANVIEN WHERE IDPB='" . mysqli_real_escape_string($bienketnoi, $mapb) . "'");
+    $subtitle = 'Nhân Viên — Phòng ' . htmlspecialchars($mapb);
 }
+?>
 
-echo '<table border="1" width="100%">';
-echo '<caption>Du lieu bang Nhan vien</caption>';
-// Tieu de cua bang chua du lieu khi hien thi tren web
-echo '<TR><TH>IDNV</TH><TH>Ho ten</TH><TH>IDPB</TH><TH>Dia chi</TH></TR>';
+<p class="tbl-title">✦ <?= $subtitle ?> ✦</p>
 
-// Hien thi tung hang
-while ($row = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-    echo '<TR><TD>' . $row['IDNV'] . '</TD><TD>' . $row['Hoten'] . '</TD><TD>' . $row['IDPB'] . '</TD><TD>' . $row['Diachi'] . '</TD></TR>';
-}
+<table>
+    <thead>
+        <tr>
+            <th>Mã NV</th>
+            <th>Họ Tên</th>
+            <th>Phòng Ban</th>
+            <th>Địa Chỉ</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php while ($row = mysqli_fetch_array($rs, MYSQLI_BOTH)): ?>
+        <tr>
+            <td><?= htmlspecialchars($row['IDNV']) ?></td>
+            <td><?= htmlspecialchars($row['Hoten']) ?></td>
+            <td><?= htmlspecialchars($row['IDPB']) ?></td>
+            <td><?= htmlspecialchars($row['Diachi']) ?></td>
+        </tr>
+        <?php endwhile; ?>
+    </tbody>
+</table>
 
-echo '</TABLE>';
+<?php
 mysqli_free_result($rs);
 mysqli_close($bienketnoi);
 ?>
